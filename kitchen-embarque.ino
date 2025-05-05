@@ -3,6 +3,7 @@
 #include "src/network/WiFiManager.h"
 #include "src/api/ApiClient.h"
 #include "src/utils/Utils.h"
+#include "src/utils/Credentials.h"
 
 // Variables globales
 String macAddress = "";
@@ -25,8 +26,11 @@ void setup() {
     Serial.println("Attente de stabilisation de la connexion WiFi...");
     delay(10000);
 
+    // Création des credentials
+    Credentials apiCredentials(API_USERNAME, API_PASSWORD);
+
     // Initialisation du client API
-    apiClient = new ApiClient(API_BASE_URL, API_USERNAME, API_PASSWORD);
+    apiClient = new ApiClient(API_BASE_URL, apiCredentials);
 
     // Enregistrement de la balance
     apiClient->registerBalance(macAddress, macAddress);

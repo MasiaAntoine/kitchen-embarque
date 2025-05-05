@@ -1,10 +1,14 @@
 #include "ApiClient.h"
 #include <WiFiClientSecure.h>
 
+ApiClient::ApiClient(const String& baseUrl, const Credentials& credentials) {
+  this->baseUrl = baseUrl;
+  this->credentials = credentials;
+}
+
 ApiClient::ApiClient(const String& baseUrl, const String& username, const String& password) {
   this->baseUrl = baseUrl;
-  this->username = username;
-  this->password = password;
+  this->credentials = Credentials(username, password);
 }
 
 bool ApiClient::registerBalance(const String& macAddress, const String& name) {
@@ -23,7 +27,7 @@ bool ApiClient::registerBalance(const String& macAddress, const String& name) {
   http.begin(*client, url);
   
   // En-tête pour l'authentification Basic
-  String authHeader = "Basic " + base64Encode(username + ":" + password);
+  String authHeader = "Basic " + base64Encode(credentials.getBasicAuthString());
   http.addHeader("Authorization", authHeader);
   http.addHeader("Content-Type", "application/json");
   
@@ -45,7 +49,7 @@ bool ApiClient::registerBalance(const String& macAddress, const String& name) {
     Serial.println("Réponse: " + response);
     
     // Analyse de la réponse avec Arduino_JSON si nécessaire
-    if (httpResponseCode == 200 || httpResponseCode == 201) {  // Ajout de 201 Created
+    if (httpResponseCode == 200 || httpResponseCode == 201) {
       JSONVar responseObj = JSON.parse(response);
       if (JSON.typeof(responseObj) != "undefined") {
         // Traitement de la réponse JSON si nécessaire

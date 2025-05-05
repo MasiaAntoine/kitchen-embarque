@@ -4,15 +4,16 @@
 #include <Arduino.h>
 #include <HTTPClient.h>
 #include <Arduino_JSON.h>
-#include "../utils/Utils.h" 
+#include "../utils/Utils.h"
+#include "../utils/Credentials.h"
 
 class ApiClient {
 private:
   String baseUrl;
-  String username;
-  String password;
+  Credentials credentials;
   
 public:
+  ApiClient(const String& baseUrl, const Credentials& credentials);
   ApiClient(const String& baseUrl, const String& username, const String& password);
   
   // Enregistre la balance sur l'API
