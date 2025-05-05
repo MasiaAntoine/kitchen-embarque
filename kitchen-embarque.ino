@@ -23,7 +23,7 @@ void setup() {
 
     // IMPORTANT : Ajouter un délai pour stabiliser la connexion
     Serial.println("Attente de stabilisation de la connexion WiFi...");
-    delay(5000);
+    delay(10000);
 
     // Initialisation du client API
     apiClient = new ApiClient(API_BASE_URL, API_USERNAME, API_PASSWORD);
