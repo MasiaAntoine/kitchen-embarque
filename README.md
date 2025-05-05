@@ -37,6 +37,25 @@ Ce firmware s'exécute sur des modules ESP32 et communique avec l'API backend po
 
 ## 🛠️ Installation et configuration
 
+### ⚙️ Configuration de l'IDE Arduino
+
+1. Dans l'IDE Arduino, installez le support ESP32 :
+
+   - Allez dans `Préférences` → `URL de gestionnaire de cartes supplémentaires`
+   - Ajoutez : `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+   - Allez dans `Outils` → `Type de carte` → `Gestionnaire de cartes`
+   - Recherchez "esp32" et installez le paquet par Espressif Systems
+
+2. Sélectionnez les paramètres suivants dans le menu `Outils` :
+   - Type de carte : "ESP32 Dev Module"
+   - CPU Frequency : "240MHz (WiFi/BT)"
+   - Flash Frequency : "80MHz"
+   - Flash Mode : "QIO"
+   - Flash Size : "4MB (32Mb)"
+   - Partition Scheme : "Default 4MB with spiffs (1.2MB APP/1.5MB SPIFFS)"
+   - Core Debug Level : "None"
+   - Port : Sélectionnez le port COM où votre ESP32 est connecté
+
 ### ⚙️ Configuration de l'environnement
 
 Créez un fichier env.h dans le dossier config en copiant le fichier env-exemple.h :
@@ -67,7 +86,7 @@ Pour compiler ce projet, vous aurez besoin d'installer les bibliothèques Arduin
 - WiFi
 - HX711 (pour le capteur de poids)
 
-Installez-les via le gestionnaire de bibliothèques de l'IDE Arduino.
+Installez-les via le gestionnaire de bibliothèques de l'IDE Arduino (`Outils` → `Gérer les bibliothèques...`).
 
 ## 📋 Architecture du projet
 
