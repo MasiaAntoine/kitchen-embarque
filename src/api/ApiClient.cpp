@@ -82,3 +82,70 @@ bool ApiClient::registerBalance(const String& macAddress, const String& name) {
   http.end();
   return success;
 }
+
+bool ApiClient::updateQuantity(const String& macAddress, int quantity) {
+  WiFiClientSecure *client = new WiFiClientSecure;
+  client->setInsecure();
+
+  HTTPClient http;
+  
+  // Augmenter le délai d'attente
+  http.setTimeout(15000);
+  
+  String url = baseUrl + "/balances/reserved-machine/update-quantity";
+  Serial.print("Envoi du poids à l'URL: ");
+  Serial.println(url);
+  
+  if (!http.begin(*client, url)) {
+    Serial.println("Échec de l'initialisation de la connexion HTTP");
+    delete client;
+    return false;
+  }
+  
+  String authHeader = "Basic " + base64Encode(credentials.getBasicAuthString());
+  http.addHeader("Authorization", authHeader);
+  http.addHeader("Content-Type", "application/json");
+  
+  JSONVar requestData;
+  requestData["mac_address"] = macAddress;
+  requestData["quantity"] = String(quantity);
+  
+  String requestBody = JSON.stringify(requestData);
+  Serial.println("Corps de la requête: " + requestBody);
+  
+  // Ajout de diagnostics supplémentaires
+  Serial.print("État de la connexion WiFi: ");
+  Serial.println(WiFi.status() == WL_CONNECTED ? "Connecté" : "Déconnecté");
+  Serial.print("Force du signal WiFi: ");
+  Serial.println(WiFi.RSSI());
+  
+  int httpResponseCode = http.POST(requestBody);
+  bool success = false;
+  
+  if (httpResponseCode > 0) {
+    String response = http.getString();
+    Serial.println("Code de réponse HTTP: " + String(httpResponseCode));
+    Serial.println("Réponse: " + response);
+    
+    if (httpResponseCode == 200 || httpResponseCode == 201) {
+      success = true;
+      Serial.println("Mise à jour de la quantité réussie");
+    }
+  } else {
+    Serial.print("Erreur lors de l'envoi de la requête HTTP: ");
+    Serial.println(httpResponseCode);
+    
+    // Diagnostics supplémentaires
+    Serial.println("Tentative de diagnostic réseau...");
+    Serial.print("Adresse IP: ");
+    Serial.println(WiFi.localIP());
+    Serial.print("Passerelle: ");
+    Serial.println(WiFi.gatewayIP());
+  }
+  
+  // Pause avant de fermer la connexion
+  delay(1000);
+  http.end();
+  delete client;
+  return success;
+}

@@ -18,6 +18,9 @@ public:
   
   // Enregistre la balance sur l'API
   bool registerBalance(const String& macAddress, const String& name);
+  
+  // Envoie les données de poids à l'API
+  bool updateQuantity(const String& macAddress, int quantity);
 };
 
 #endif

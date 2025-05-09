@@ -81,13 +81,16 @@ void loop() {
       Serial.println("g");
       
       // Envoi des données à l'API si elle est disponible
-      // if (apiClient != nullptr) {
-        // Ici, vous pouvez ajouter le code pour envoyer les données à votre API
-        // Par exemple: apiClient->sendWeightData(macAddress, currentWeight);
-        // Serial.println("Données envoyées à l'API");
-      // }
-      Serial.println("Données envoyées à l'API");
-
+      if (apiClient != nullptr) {
+        bool success = apiClient->updateQuantity(macAddress, currentWeight);
+        if (success) {
+          Serial.println("Données de poids envoyées à l'API avec succès");
+        } else {
+          Serial.println("Échec de l'envoi des données à l'API");
+        }
+      } else {
+        Serial.println("Client API non initialisé, impossible d'envoyer les données");
+      }
       
       // Mise à jour du dernier poids connu
       lastWeight = currentWeight;
