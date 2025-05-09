@@ -1,42 +1,52 @@
-#include <Arduino.h>
-#include "src/config/env.h"
-#include "src/network/WiFiManager.h"
-#include "src/api/ApiClient.h"
-#include "src/utils/Utils.h"
-#include "src/utils/Credentials.h"
+#include "HX711.h"
 
-// Variables globales
-String macAddress = "";
-ApiClient* apiClient = nullptr;
+HX711 scale(5, 4);
+
+float calibration_factor = -106;
+float units;
+float ounces;
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);
+  Serial.println("HX711 calibration sketch");
+  Serial.println("Remove all weight from scale");
+  Serial.println("After readings begin, place known weight on scale");
+  Serial.println("Press + or a to increase calibration factor");
+  Serial.println("Press - or z to decrease calibration factor");
 
-  Serial.println("Démarrage...");
+  scale.set_scale();
+  scale.tare();  //Reset the scale to 0
 
-  // Connexion au WiFi
-  if (connectToWiFi(WIFI_SSID, WIFI_PASSWORD)) {
-    // Obtention de l'adresse MAC
-    macAddress = getMacAddress();
-    Serial.print("Adresse MAC: ");
-    Serial.println(macAddress);
-
-    // IMPORTANT : Ajouter un délai pour stabiliser la connexion
-    Serial.println("Attente de stabilisation de la connexion WiFi...");
-    delay(10000);
-
-    // Création des credentials
-    Credentials apiCredentials(API_USERNAME, API_PASSWORD);
-
-    // Initialisation du client API
-    apiClient = new ApiClient(API_BASE_URL, apiCredentials);
-
-    // Enregistrement de la balance
-    apiClient->registerBalance(macAddress, macAddress);
-  }
+  long zero_factor = scale.read_average(); //Get a baseline reading
+  Serial.print("Zero factor: "); //This can be used to remove the need to tare the scale. Useful in permanent scale projects.
+  Serial.println(zero_factor);
 }
 
 void loop() {
-  delay(10000);
+
+  scale.set_scale(calibration_factor); //Adjust to this calibration factor
+
+  Serial.print("Reading: ");
+  units = scale.get_units(), 10;
+  if (units < 0)
+  {
+    units = 0.00;
+  }
+  ounces = units * 0.035274;
+
+  // Convertir en entier pour afficher sans décimales
+  Serial.print(round(units)); // Arrondi à l'entier le plus proche
+  Serial.print(" grams");
+  Serial.print(" calibration_factor: ");
+  Serial.print(calibration_factor);
+  Serial.println();
+
+  if(Serial.available())
+  {
+    char temp = Serial.read();
+    if(temp == '+' || temp == 'a')
+      calibration_factor += 1;
+    else if(temp == '-' || temp == 'z')
+      calibration_factor -= 1;
+  }
 }
